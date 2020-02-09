@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">project1_DayTripPlanner_Montgomery</string>
+    <string name="app_name">Day Trip Planner</string>
+    <string name="address_name">Address</string>
+    <string name="food_title">Food</string>
+    <string-array name="restaurant_types">
+        <item>American</item>
+        <item>Chinese</item>
+        <item>Italian</item>
+        <item>Korean</item>
+        <item>Mexican</item>
+    </string-array>
 </resources>
