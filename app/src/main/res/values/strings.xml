@@ -2,11 +2,23 @@
     <string name="app_name">Day Trip Planner</string>
     <string name="address_name">Address</string>
     <string name="food_title">Food</string>
+    <string name="activity_title">Activities</string>
+
+
+    #arrays
     <string-array name="restaurant_types">
         <item>American</item>
         <item>Chinese</item>
         <item>Italian</item>
         <item>Korean</item>
         <item>Mexican</item>
+    </string-array>
+
+    <string-array name="activities_types">
+        <item>Arcades</item>
+        <item>Festivals</item>
+        <item>Paint and Sip</item>
+        <item>Tours</item>
+        <item>Parks</item>
     </string-array>
 </resources>
