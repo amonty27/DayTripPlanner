@@ -3,7 +3,8 @@
     <string name="address_name">Address</string>
     <string name="food_title">Food</string>
     <string name="activity_title">Activities</string>
-
+    <string name="search">Search</string>
+    <string name="_0">0</string>
 
     #arrays
     <string-array name="restaurant_types">
