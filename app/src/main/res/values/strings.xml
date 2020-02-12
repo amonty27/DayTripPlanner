@@ -8,6 +8,7 @@
 
     #arrays
     <string-array name="restaurant_types">
+        <item>Choose Food</item>
         <item>American</item>
         <item>Chinese</item>
         <item>Italian</item>
@@ -16,6 +17,7 @@
     </string-array>
 
     <string-array name="activities_types">
+        <item>Choose Activity</item>
         <item>Arcades</item>
         <item>Festivals</item>
         <item>Paint and Sip</item>
