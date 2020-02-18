@@ -6,7 +6,7 @@
     <string name="search">Search</string>
     <string name="_0">0</string>
 
-    #arrays
+    <!--- arrays -->
     <string-array name="restaurant_types">
         <item>Choose Food</item>
         <item>American</item>
