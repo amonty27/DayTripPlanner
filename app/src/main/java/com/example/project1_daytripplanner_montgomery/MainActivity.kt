@@ -15,7 +15,6 @@ import androidx.core.view.get
 
 /* TODO :   Add shared preferences for the foodSpinner and activitySpinner
             Show previously entered values in the Address, foodSpinner, activitySpinner, foodSeekBar, and activitySeekBar
-            Enable the search button when address, foodspinner, and activityspinner options have been chosen
  */
 class MainActivity : AppCompatActivity() {
 
@@ -61,13 +60,21 @@ class MainActivity : AppCompatActivity() {
             // Save user credentials to file
             val inputtedUser: String = userInput.text.toString()
             val inputtedActivity : Int = activitySpinner.firstVisiblePosition
+            val inputtedFood : Int = foodSpinner.firstVisiblePosition
+            val inputtedFoodNumber : Int = foodSeekBar.getProgress()
+            val inputtedActivityNumber : Int = activitySeekBar.getProgress()
+
             // save what the user entered to the shared preferences folder
             preferences
                 .edit()
-                .putString("userInput", inputtedUser.toString())
+                .putString("userInput", inputtedUser)
+                .putInt("activitySpinner", inputtedActivity)
+                .putInt("foodSpinner", inputtedFood)
+                .putInt("foodSeekBar", inputtedFoodNumber)
+                .putInt("activitySeekBar", inputtedActivityNumber)
                 .apply()
 
-            val array = listOf(preferences.getString("userInput", ""))
+            val array = preferences.getString("userInput", "")
             val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
             arrayAdapter.addAll(array)
             val builder = AlertDialog.Builder(this)
@@ -80,12 +87,11 @@ class MainActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-
-
-            ///builder.setSingleChoiceItems(array,-1)
+            //build the Radio Button view
             builder.show()
         }
 
+        // set the
         searchButton.isEnabled = false
         foodChange = false
         activityChange = false
@@ -96,20 +102,15 @@ class MainActivity : AppCompatActivity() {
 
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // if not  null and the position is not at the default, set
-
                 if (parent != null) {
                     if(!parent.getItemAtPosition(position).equals("Choose Food")){
-                        //searchButton.isEnabled = true
                         foodChange = true
                     }
                     if(parent.getItemAtPosition(position).equals("Choose Food")){
-                        //searchButton.isEnabled = true
                         foodChange = false
                     }
                     if(foodChange === true && activityChange === true && searchChange === true) {
                         searchButton.isEnabled = true
-                        //foodChange = true
                     }
                     else{searchButton.isEnabled = false}
                 }
@@ -117,32 +118,24 @@ class MainActivity : AppCompatActivity() {
         }
 
        activitySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 // if not  null and the position is not at the default, set
 
                 if (parent != null) {
                     if(!parent.getItemAtPosition(position).equals("Choose Activity")){
-                        //searchButton.isEnabled = true
                         activityChange = true
                     }
                     if(parent.getItemAtPosition(position).equals("Choose Activity")){
-                        //searchButton.isEnabled = true
                         activityChange = false
                     }
                     if(foodChange && activityChange && searchChange) {
                         searchButton.isEnabled = true
-                        //foodChange = true
                     }
                     else{searchButton.isEnabled = false}
                 }
             }
         }
-
-        //foodSpinner.setOnItemSelectedListener(spinnerWatcher)
-        //activitySpinner.setOnItemSelectedListener(spinnerWatcher)
 
         // add a listener to the userInput Field to track changes
         userInput.addTextChangedListener(object : TextWatcher {
@@ -160,9 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val savedSearch = preferences.getString("userInput", "")
-
-        userInput.setText(savedSearch)
         // create a listener for the SeekBar used for the food
         foodSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -178,6 +168,13 @@ class MainActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) { }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+
+        // set the values of the userInput, Spinners, and SeekBars from the shared preferences
+        userInput.setText(preferences.getString("userInput", ""))
+        activitySpinner.setSelection(preferences.getInt("activitySpinner",-1))
+        activitySeekBar.setProgress(preferences.getInt("activitySeekBar",-1))
+        foodSpinner.setSelection(preferences.getInt("foodSpinner",-1))
+        foodSeekBar.setProgress(preferences.getInt("foodSeekBar",-1))
 
     }
 
