@@ -2,6 +2,7 @@ package com.example.project1_daytripplanner_montgomery
 
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,12 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 
+/*
+    TODO:
+        Geocoding and Geocoding Errors
+        Cancel Button for the dialog
+
+ */
 class MainActivity : AppCompatActivity() {
 
     lateinit var foodNumber: TextView
@@ -75,13 +82,15 @@ class MainActivity : AppCompatActivity() {
             val array = preferences.getString("userInput", "")
             val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
             arrayAdapter.addAll(array)
-            val builder = AlertDialog.Builder(this)
 
-            builder.setTitle("dialog Box")
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Results")
                 .setAdapter(arrayAdapter) { dialog, which ->
                     val intent: Intent = Intent(this, MapsActivity::class.java)
                     startActivity(intent)
                 }
+                .setCancelable(true)
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
             //build the Radio Button view
             builder.show()
 
