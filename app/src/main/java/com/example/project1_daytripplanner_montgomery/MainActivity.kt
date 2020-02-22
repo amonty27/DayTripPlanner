@@ -2,6 +2,7 @@ package com.example.project1_daytripplanner_montgomery
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,9 +14,6 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 
-/* TODO :   Add shared preferences for the foodSpinner and activitySpinner
-            Show previously entered values in the Address, foodSpinner, activitySpinner, foodSeekBar, and activitySeekBar
- */
 class MainActivity : AppCompatActivity() {
 
     lateinit var foodNumber: TextView
@@ -81,14 +79,13 @@ class MainActivity : AppCompatActivity() {
 
             builder.setTitle("dialog Box")
                 .setAdapter(arrayAdapter) { dialog, which ->
-                    Toast.makeText(
-                        this,
-                        "You picked: ${preferences.getString("userInput", "")}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val intent: Intent = Intent(this, MapsActivity::class.java)
+                    startActivity(intent)
                 }
             //build the Radio Button view
             builder.show()
+
+
         }
 
         // set the
