@@ -20,7 +20,7 @@ import android.location.Address
 
 /*
     TODO:
-        Geocoding and Geocoding Errors
+       Geocoding Errors
  */
 class MainActivity : AppCompatActivity() {
 
@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     var foodChange : Boolean = false
     var activityChange : Boolean = false
     var searchChange : Boolean = false
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,13 +79,27 @@ class MainActivity : AppCompatActivity() {
                 .putInt("activitySeekBar", inputtedActivityNumber)
                 .apply()
 
-            val array = preferences.getString("userInput", "")
-            val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
+            // create an arrayAdapter to make a dialog and one to send through the intent
+            val arrayAdapter = ArrayAdapter<Address>(this, android.R.layout.select_dialog_multichoice)
+            val arrayAdapter2 = ArrayAdapter<String>(this, android.R.layout.select_dialog_multichoice)
 
+            // create the alert diaolg
+            val builder = AlertDialog.Builder(this)
+            // set the title and other things to be displayed in the box
+            builder.setTitle("Results")
+            builder.setAdapter(arrayAdapter2) { dialog, which ->
+                // create and start an intent to go to the MapsActivity
+                val intent = Intent(this, MapsActivity::class.java)
+                intent.putExtra("result", arrayAdapter.getItem(which))
+                startActivity(intent)
+            }
+            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+
+            // Asynchronously access the geocoder class to get the result from users input
             doAsync{
                 val geocoder = Geocoder(this@MainActivity)
                 val results: List<Address> = try {
-                 geocoder.getFromLocationName(preferences.getString("userInput",""),5)
+                    geocoder.getFromLocationName(preferences.getString("userInput",""),5)
                 }
                 catch (exception : Exception){
                     exception.printStackTrace()
@@ -94,27 +107,28 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 if (results.isNotEmpty()){
-                    for (i in 0 until 5){
-                        var what = results.get(i)
+                    // the size of the results array of returned values from geocode
+                    var length = results.size
+
+                    // for debugging
+                    Log.d("liciTag", "Value: " + length.toString());
+
+                    // for all the values returned, add the addresses to the 2 arrayAdapters
+                    for (i in 0 until length){
+                        var what: Address = results.get(i)
                         runOnUiThread {
-                            arrayAdapter.add(what.getAddressLine(0))
+                            arrayAdapter.add(what)
+                            arrayAdapter2.add(what.getAddressLine(0))
                         }
                     }
                 }
             }
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Results")
-                .setAdapter(arrayAdapter) { dialog, which ->
-                    val intent: Intent = Intent(this, MapsActivity::class.java)
-                    startActivity(intent)
-                }
-                .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
             //build the Radio Button view
             builder.show()
 
-
         }
 
+        // initial state of checks should be false so the search button is not clickable until all fields are entered
         searchButton.isEnabled = false
         foodChange = false
         activityChange = false
@@ -125,22 +139,27 @@ class MainActivity : AppCompatActivity() {
 
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // parent is the current value selected in the spinner
                 if (parent != null) {
+                    // if the parent position does not equal the defualt of "Choose Food" set the check to true
                     if(!parent.getItemAtPosition(position).equals("Choose Food")){
                         foodChange = true
                     }
+                    // if it is, set to false
                     if(parent.getItemAtPosition(position).equals("Choose Food")){
                         foodChange = false
                     }
+                    // if all of the other vaules have been set, enable the search button
                     if(foodChange === true && activityChange === true && searchChange === true) {
                         searchButton.isEnabled = true
                     }
+                    // if not, do not enable the search button
                     else{searchButton.isEnabled = false}
                 }
             }
         }
 
-       activitySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+        activitySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {}
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 // if not  null and the position is not at the default, set
