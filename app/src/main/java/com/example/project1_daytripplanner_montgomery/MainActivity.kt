@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -14,12 +15,12 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
+import org.jetbrains.anko.doAsync
+import android.location.Address
 
 /*
     TODO:
         Geocoding and Geocoding Errors
-        Cancel Button for the dialog
-
  */
 class MainActivity : AppCompatActivity() {
 
@@ -81,15 +82,32 @@ class MainActivity : AppCompatActivity() {
 
             val array = preferences.getString("userInput", "")
             val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
-            arrayAdapter.addAll(array)
 
+            doAsync{
+                val geocoder = Geocoder(this@MainActivity)
+                val results: List<Address> = try {
+                 geocoder.getFromLocationName(preferences.getString("userInput",""),5)
+                }
+                catch (exception : Exception){
+                    exception.printStackTrace()
+                    listOf<Address>()
+                }
+
+                if (results.isNotEmpty()){
+                    for (i in 0 until 5){
+                        var what = results.get(i)
+                        runOnUiThread {
+                            arrayAdapter.add(what.getAddressLine(0))
+                        }
+                    }
+                }
+            }
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Results")
                 .setAdapter(arrayAdapter) { dialog, which ->
                     val intent: Intent = Intent(this, MapsActivity::class.java)
                     startActivity(intent)
                 }
-                .setCancelable(true)
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
             //build the Radio Button view
             builder.show()
@@ -97,7 +115,6 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        // set the
         searchButton.isEnabled = false
         foodChange = false
         activityChange = false
