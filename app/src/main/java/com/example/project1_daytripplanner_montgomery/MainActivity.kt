@@ -20,7 +20,9 @@ import android.location.Address
 
 /*
     TODO:
-       Geocoding Errors
+       Ask, "Is there a way to not display the Dialog until the thread has returned the addresses?
+       Geocoding error: - if there is no results, display "no results"
+                        - if there is no network detectiction, toast "no network connectivity"
  */
 class MainActivity : AppCompatActivity() {
 
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity() {
             val inputtedUser: String = userInput.text.toString()
             val inputtedActivity : Int = activitySpinner.firstVisiblePosition
             val inputtedFood : Int = foodSpinner.firstVisiblePosition
+            val inputtedActivityName : String = activitySpinner.getItemAtPosition(inputtedActivity).toString()
+            val inputtedFoodName : String = foodSpinner.getItemAtPosition(inputtedFood).toString()
             val inputtedFoodNumber : Int = foodSeekBar.getProgress()
             val inputtedActivityNumber : Int = activitySeekBar.getProgress()
 
@@ -75,6 +79,8 @@ class MainActivity : AppCompatActivity() {
                 .putString("userInput", inputtedUser)
                 .putInt("activitySpinner", inputtedActivity)
                 .putInt("foodSpinner", inputtedFood)
+                .putString("activitySpinnerName", inputtedActivityName)
+                .putString("foodSpinnerName", inputtedFoodName)
                 .putInt("foodSeekBar", inputtedFoodNumber)
                 .putInt("activitySeekBar", inputtedActivityNumber)
                 .apply()
