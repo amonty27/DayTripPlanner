@@ -25,7 +25,7 @@ class DetailsAdapter(val places: List<places>) : RecyclerView.Adapter<DetailsAda
         val currentPlace = places[position]
 
         val intentCall : Intent = Intent(Intent.ACTION_DIAL)
-        val intentLink : Intent = Intent(Intent.ACTION_WEB_SEARCH)
+        val intentLink : Intent = Intent(Intent.ACTION_VIEW)
 
 
         holder.call.isVisible = false
@@ -44,12 +44,13 @@ class DetailsAdapter(val places: List<places>) : RecyclerView.Adapter<DetailsAda
 
 
         holder.call.setOnClickListener{
-            //startActivity(intent)
+            holder.call.context.startActivity(intentCall)
 
         }
 
         holder.link.setOnClickListener{
-            //startActivity(intentLink)
+            intentLink.data = Uri.parse("${currentPlace.url}")
+            holder.call.context.startActivity(intentLink)
 
         }
 

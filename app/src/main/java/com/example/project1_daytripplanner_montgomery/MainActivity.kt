@@ -17,13 +17,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 import org.jetbrains.anko.doAsync
 import android.location.Address
+import androidx.core.view.isVisible
+import org.jetbrains.anko.toast
 
-/*
-    TODO:
-       Ask, "Is there a way to not display the Dialog until the thread has returned the addresses?
-       Geocoding error: - if there is no results, display "no results"
-                        - if there is no network detectiction, toast "no network connectivity"
- */
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var foodNumber: TextView
@@ -38,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var foodSpinner: Spinner
     lateinit var activitySpinner: Spinner
+
+    lateinit var progressBar : ProgressBar
 
     var foodChange : Boolean = false
     var activityChange : Boolean = false
@@ -60,7 +59,9 @@ class MainActivity : AppCompatActivity() {
         userInput = findViewById(R.id.address)
         foodSpinner = findViewById(R.id.foodSpin)
         activitySpinner = findViewById(R.id.activitySpin)
+        progressBar = findViewById(R.id.progressBar)
 
+        progressBar.isVisible = false
         // set a listener for the search button to perform certain actions
         searchButton.setOnClickListener{ view: View ->
 
@@ -89,48 +90,70 @@ class MainActivity : AppCompatActivity() {
             val arrayAdapter = ArrayAdapter<Address>(this, android.R.layout.select_dialog_multichoice)
             val arrayAdapter2 = ArrayAdapter<String>(this, android.R.layout.select_dialog_multichoice)
 
-            // create the alert diaolg
-            val builder = AlertDialog.Builder(this)
-            // set the title and other things to be displayed in the box
-            builder.setTitle("Results")
-            builder.setAdapter(arrayAdapter2) { dialog, which ->
-                // create and start an intent to go to the MapsActivity
-                val intent = Intent(this, MapsActivity::class.java)
-                intent.putExtra("result", arrayAdapter.getItem(which))
-                startActivity(intent)
+
+            if(inputtedFoodNumber == 0 && inputtedActivityNumber == 0){
+                Toast.makeText(this, "Please put a value greater than 0 for one of them", Toast.LENGTH_LONG).show()
             }
-            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
-
-            // Asynchronously access the geocoder class to get the result from users input
-            doAsync{
-                val geocoder = Geocoder(this@MainActivity)
-                val results: List<Address> = try {
-                    geocoder.getFromLocationName(preferences.getString("userInput",""),5)
+            else {
+                // create the alert diaolg
+                val builder = AlertDialog.Builder(this)
+                // set the title and other things to be displayed in the box
+                builder.setTitle("Results")
+                builder.setAdapter(arrayAdapter2) { dialog, which ->
+                    // create and start an intent to go to the MapsActivity
+                        val intent = Intent(this, MapsActivity::class.java)
+                        intent.putExtra("result", arrayAdapter.getItem(which))
+                        startActivity(intent)
                 }
-                catch (exception : Exception){
-                    exception.printStackTrace()
-                    listOf<Address>()
-                }
+                builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
 
-                if (results.isNotEmpty()){
-                    // the size of the results array of returned values from geocode
-                    var length = results.size
-
-                    // for debugging
-                    Log.d("liciTag", "Value: " + length.toString());
-
-                    // for all the values returned, add the addresses to the 2 arrayAdapters
-                    for (i in 0 until length){
-                        var what: Address = results.get(i)
+                // Asynchronously access the geocoder class to get the result from users input
+                doAsync{
+                    val geocoder = Geocoder(this@MainActivity)
+                    var check1 : Boolean = false
+                    var check2 : Boolean = false
+                    runOnUiThread { progressBar.isVisible = true }
+                    val results: List<Address> = try {
+                        check2 = true
+                        geocoder.getFromLocationName(preferences.getString("userInput",""),5)
+                    }
+                    catch (exception : Exception){
+                        exception.printStackTrace()
                         runOnUiThread {
-                            arrayAdapter.add(what)
-                            arrayAdapter2.add(what.getAddressLine(0))
+                            Toast.makeText(this@MainActivity, "No Internet Connection", Toast.LENGTH_SHORT).show()
+                            progressBar.isVisible = false }
+                        check1 = true
+                        listOf<Address>()
+                    }
+
+                    if (results.isNotEmpty() && check1 == false && check2 == true){
+                        // the size of the results array of returned values from geocode
+                        check2 = false
+                        var length = results.size
+
+                        // for debugging
+                        Log.d("liciTag", "Value: " + length.toString());
+
+                        // for all the values returned, add the addresses to the 2 arrayAdapters
+                        for (i in 0 until length){
+                            var what: Address = results.get(i)
+                            runOnUiThread {
+                                arrayAdapter.add(what)
+                                arrayAdapter2.add(what.getAddressLine(0))
+                            }
+                        }
+                        runOnUiThread {  progressBar.isVisible = false; builder.show() }
+                    }
+                    else{
+                        runOnUiThread {
+                             progressBar.isVisible = false
+                            Toast.makeText(this@MainActivity, "No Results", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
+
             }
-            //build the Radio Button view
-            builder.show()
+
 
         }
 
@@ -160,7 +183,9 @@ class MainActivity : AppCompatActivity() {
                         searchButton.isEnabled = true
                     }
                     // if not, do not enable the search button
-                    else{searchButton.isEnabled = false}
+                    else{
+                        searchButton.isEnabled = false
+                    }
                 }
             }
         }
