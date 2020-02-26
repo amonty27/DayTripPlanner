@@ -83,3 +83,7 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+app/src/release/res/values/google_maps_api.xml
+google_maps_api.xml
+app/src/release/res/values/yelp_api.xml

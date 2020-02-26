@@ -2,20 +2,25 @@ package com.example.project1_daytripplanner_montgomery
 
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Geocoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
+import org.jetbrains.anko.doAsync
+import android.location.Address
+import androidx.core.view.isVisible
+import org.jetbrains.anko.toast
 
-/* TODO :   Add shared preferences for the foodSpinner and activitySpinner
-            Show previously entered values in the Address, foodSpinner, activitySpinner, foodSeekBar, and activitySeekBar
-            Enable the search button when address, foodspinner, and activityspinner options have been chosen
- */
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var foodNumber: TextView
@@ -31,120 +36,219 @@ class MainActivity : AppCompatActivity() {
     lateinit var foodSpinner: Spinner
     lateinit var activitySpinner: Spinner
 
-    lateinit var foodChange : seekBarChange
-    lateinit var activityChange : seekBarChange
+    lateinit var progressBar : ProgressBar
 
+    var foodChange : Boolean = false
+    var activityChange : Boolean = false
+    var searchChange : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //initializing variables
-        foodSeekBar = findViewById(R.id.foodSeekBar)
-        foodNumber = findViewById(R.id.foodNumber)
-
-
-        activitySeekBar = findViewById(R.id.activitySeekBar)
-        activityNumber = findViewById(R.id.activityNumber)
-
-        searchButton = findViewById(R.id.searchButton)
-
-        userInput = findViewById(R.id.address)
-
-        foodSpinner = findViewById(R.id.foodSpin)
-        activitySpinner = findViewById(R.id.activitySpin)
-
-        // for future use
-        /*foodChange = seekBarChange.NOTCHANGED
-        activityChange = seekBarChange.NOTCHANGED*/
-
-        // set the search button to false so that the user cannot search until conditions cleared
-        searchButton.isEnabled = false
-
         //set up the saved preferences to save the Address
         val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
 
+        //initializing variables
+        foodSeekBar = findViewById(R.id.foodSeekBar)
+        foodNumber = findViewById(R.id.foodNumber)
+        activitySeekBar = findViewById(R.id.activitySeekBar)
+        activityNumber = findViewById(R.id.activityNumber)
+        searchButton = findViewById(R.id.searchButton)
+        userInput = findViewById(R.id.address)
+        foodSpinner = findViewById(R.id.foodSpin)
+        activitySpinner = findViewById(R.id.activitySpin)
+        progressBar = findViewById(R.id.progressBar)
+
+        progressBar.isVisible = false
+        // set a listener for the search button to perform certain actions
+        searchButton.setOnClickListener{ view: View ->
+
+            // Save user credentials to file
+            val inputtedUser: String = userInput.text.toString()
+            val inputtedActivity : Int = activitySpinner.firstVisiblePosition
+            val inputtedFood : Int = foodSpinner.firstVisiblePosition
+            val inputtedActivityName : String = activitySpinner.getItemAtPosition(inputtedActivity).toString()
+            val inputtedFoodName : String = foodSpinner.getItemAtPosition(inputtedFood).toString()
+            val inputtedFoodNumber : Int = foodSeekBar.getProgress()
+            val inputtedActivityNumber : Int = activitySeekBar.getProgress()
+
+            // save what the user entered to the shared preferences folder
+            preferences
+                .edit()
+                .putString("userInput", inputtedUser)
+                .putInt("activitySpinner", inputtedActivity)
+                .putInt("foodSpinner", inputtedFood)
+                .putString("activitySpinnerName", inputtedActivityName)
+                .putString("foodSpinnerName", inputtedFoodName)
+                .putInt("foodSeekBar", inputtedFoodNumber)
+                .putInt("activitySeekBar", inputtedActivityNumber)
+                .apply()
+
+            // create an arrayAdapter to make a dialog and one to send through the intent
+            val arrayAdapter = ArrayAdapter<Address>(this, android.R.layout.select_dialog_multichoice)
+            val arrayAdapter2 = ArrayAdapter<String>(this, android.R.layout.select_dialog_multichoice)
+
+
+            if(inputtedFoodNumber == 0 && inputtedActivityNumber == 0){
+                Toast.makeText(this, "Please put a value greater than 0 for one of them", Toast.LENGTH_LONG).show()
+            }
+            else {
+                // create the alert diaolg
+                val builder = AlertDialog.Builder(this)
+                // set the title and other things to be displayed in the box
+                builder.setTitle("Results")
+                builder.setAdapter(arrayAdapter2) { dialog, which ->
+                    // create and start an intent to go to the MapsActivity
+                        val intent = Intent(this, MapsActivity::class.java)
+                        intent.putExtra("result", arrayAdapter.getItem(which))
+                        startActivity(intent)
+                }
+                builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
+
+                // Asynchronously access the geocoder class to get the result from users input
+                doAsync{
+                    val geocoder = Geocoder(this@MainActivity)
+                    var check1 : Boolean = false
+                    var check2 : Boolean = false
+                    runOnUiThread { progressBar.isVisible = true }
+                    val results: List<Address> = try {
+                        check2 = true
+                        geocoder.getFromLocationName(preferences.getString("userInput",""),5)
+                    }
+                    catch (exception : Exception){
+                        exception.printStackTrace()
+                        runOnUiThread {
+                            Toast.makeText(this@MainActivity, "No Internet Connection", Toast.LENGTH_SHORT).show()
+                            progressBar.isVisible = false }
+                        check1 = true
+                        listOf<Address>()
+                    }
+
+                    if (results.isNotEmpty() && check1 == false && check2 == true){
+                        // the size of the results array of returned values from geocode
+                        check2 = false
+                        var length = results.size
+
+                        // for debugging
+                        Log.d("liciTag", "Value: " + length.toString());
+
+                        // for all the values returned, add the addresses to the 2 arrayAdapters
+                        for (i in 0 until length){
+                            var what: Address = results.get(i)
+                            runOnUiThread {
+                                arrayAdapter.add(what)
+                                arrayAdapter2.add(what.getAddressLine(0))
+                            }
+                        }
+                        runOnUiThread {  progressBar.isVisible = false; builder.show() }
+                    }
+                    else{
+                        runOnUiThread {
+                             progressBar.isVisible = false
+                            Toast.makeText(this@MainActivity, "No Results", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+            }
+
+
+        }
+
+        // initial state of checks should be false so the search button is not clickable until all fields are entered
+        searchButton.isEnabled = false
+        foodChange = false
+        activityChange = false
+        searchChange = false
+
+        foodSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // parent is the current value selected in the spinner
+                if (parent != null) {
+                    // if the parent position does not equal the defualt of "Choose Food" set the check to true
+                    if(!parent.getItemAtPosition(position).equals("Choose Food")){
+                        foodChange = true
+                    }
+                    // if it is, set to false
+                    if(parent.getItemAtPosition(position).equals("Choose Food")){
+                        foodChange = false
+                    }
+                    // if all of the other vaules have been set, enable the search button
+                    if(foodChange === true && activityChange === true && searchChange === true) {
+                        searchButton.isEnabled = true
+                    }
+                    // if not, do not enable the search button
+                    else{
+                        searchButton.isEnabled = false
+                    }
+                }
+            }
+        }
+
+        activitySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // if not  null and the position is not at the default, set
+
+                if (parent != null) {
+                    if(!parent.getItemAtPosition(position).equals("Choose Activity")){
+                        activityChange = true
+                    }
+                    if(parent.getItemAtPosition(position).equals("Choose Activity")){
+                        activityChange = false
+                    }
+                    if(foodChange && activityChange && searchChange) {
+                        searchButton.isEnabled = true
+                    }
+                    else{searchButton.isEnabled = false}
+                }
+            }
+        }
+
+        // add a listener to the userInput Field to track changes
+        userInput.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val inputtedUser : String = userInput.text.toString()
+                // check that the code has not been changed and if not enable the search button
+                searchChange = inputtedUser.trim().isNotEmpty()
+
+                if(foodChange && activityChange && searchChange) {
+                    searchButton.isEnabled = true
+                }
+                else{searchButton.isEnabled = false}
+            }
+        })
 
         // create a listener for the SeekBar used for the food
         foodSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //update the number beside the seek bar with the value the seek bar is at currently
                 foodNumber.text = progress.toString()
-                foodChange = seekBarChange.CHANGED
-                //init = 1
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
-
-
-
-
-
-
-
 
         activitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                activityNumber.text = progress.toString()
-                activityChange = seekBarChange.CHANGED
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {activityNumber.text = progress.toString()}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) { }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+        // set the values of the userInput, Spinners, and SeekBars from the shared preferences
+        userInput.setText(preferences.getString("userInput", ""))
+        activitySpinner.setSelection(preferences.getInt("activitySpinner",-1))
+        activitySeekBar.setProgress(preferences.getInt("activitySeekBar",-1))
+        foodSpinner.setSelection(preferences.getInt("foodSpinner",-1))
+        foodSeekBar.setProgress(preferences.getInt("foodSeekBar",-1))
 
-        // add a listener to the userInput Field to track changes
-        userInput.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                preferences.edit().putString("SEARCH", userInput.text.toString()).apply()
-                searchButton.isEnabled = true
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //userInput = preferences.getString("SEARCH","")
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                searchButton.isEnabled = true
-            }
-        })
-
-
-               //searchButton.isEnabled = true
-               searchButton.setOnClickListener {
-                   val array = listOf(preferences.getString("SEARCH", ""))
-                   val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice)
-                   arrayAdapter.addAll(array)
-                   val builder = AlertDialog.Builder(this)
-
-                   builder.setTitle("dialog Box")
-                       .setAdapter(arrayAdapter) { dialog, which ->
-                           Toast.makeText(
-                               this,
-                               "You picked: ${preferences.getString("SEARCH", "")}",
-                               Toast.LENGTH_SHORT
-                           ).show()
-                       }
-
-
-                   ///builder.setSingleChoiceItems(array,-1)
-                   builder.show()
-               }
     }
 
-}
-enum class seekBarChange{
-    NOTCHANGED,CHANGED
 }

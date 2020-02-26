@@ -5,23 +5,26 @@
     <string name="activity_title">Activities</string>
     <string name="search">Search</string>
     <string name="_0">0</string>
+    <string name="address">2121 H st. NW, Washington, D.C. 20052</string>
+    <string name="pricePoint">$$$$$</string>
 
-    #arrays
+    <!--- arrays -->
     <string-array name="restaurant_types">
         <item>Choose Food</item>
-        <item>American</item>
-        <item>Chinese</item>
-        <item>Italian</item>
-        <item>Korean</item>
-        <item>Mexican</item>
+        <item>american</item>
+        <item>chinese</item>
+        <item>italian</item>
+        <item>korean</item>
+        <item>mexican</item>
     </string-array>
 
     <string-array name="activities_types">
         <item>Choose Activity</item>
-        <item>Arcades</item>
-        <item>Festivals</item>
-        <item>Paint and Sip</item>
-        <item>Tours</item>
-        <item>Parks</item>
+        <item>arcades</item>
+        <item>museums</item>
+        <item>fashion</item>
+        <item>tours</item>
+        <item>parks</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 </resources>
