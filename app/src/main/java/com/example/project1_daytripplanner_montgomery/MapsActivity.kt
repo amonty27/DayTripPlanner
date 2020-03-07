@@ -24,6 +24,7 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONArray
 import org.json.JSONObject
+import java.nio.channels.spi.AbstractSelectionKey
 
 /*
     TODO
@@ -41,6 +42,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var detailsButton : Button
+   // private lateinit var yelpApiKey: String
+    private lateinit var places : places
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +63,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(intent)
         }
 
+        val address: Address = intent.getParcelableExtra<Address>("result")
+        // get values from the address to use in making a marker on the map
+        val markerLatLng : LatLng = LatLng(address.latitude, address.longitude)
+        val streetAddress : String = address.getAddressLine(0)
+        val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
+        val mamp = MapsManager()
+        val yelpApiKey = getString(R.string.yelp_key)
+
+        doAsync {
+            val places = try {
+                mamp.retrieveActivity(
+                    markerLatLng.latitude,
+                    markerLatLng.longitude,
+                    preferences,
+                    yelpApiKey
+                )
+
+            } catch (exception: Exception) {
+                listOf<places>()
+            }
+
+        }
     }
 
     /**
@@ -90,10 +115,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.addCircle(circleOptions)
 
         val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
-        //val mamp = MapsManager()
-
-
-        //val places = mamp.retrieveActivity(markerLatLng.latitude,markerLatLng.longitude,preferences, 0, 0)
 
     }
 }

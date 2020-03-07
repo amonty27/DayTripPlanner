@@ -31,7 +31,7 @@ class DetailsAdapter(val places: List<places>) : RecyclerView.Adapter<DetailsAda
         holder.call.isVisible = false
 
         holder.name.text = currentPlace.name
-        holder.address.text = currentPlace.Address
+        holder.address.text = currentPlace.address
         holder.pricePoint.text = currentPlace.pricePoint
 
         holder.ratingBar.setRating(currentPlace.rating)
