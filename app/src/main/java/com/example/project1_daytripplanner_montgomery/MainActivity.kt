@@ -18,6 +18,7 @@ import androidx.core.view.get
 import org.jetbrains.anko.doAsync
 import android.location.Address
 import androidx.core.view.isVisible
+import kotlinx.android.synthetic.main.row_details.*
 import org.jetbrains.anko.toast
 
 
@@ -41,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     var foodChange : Boolean = false
     var activityChange : Boolean = false
     var searchChange : Boolean = false
+    var activityNumberChange : Boolean = false
+    var foodNumberChange : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,8 +70,8 @@ class MainActivity : AppCompatActivity() {
 
             // Save user credentials to file
             val inputtedUser: String = userInput.text.toString()
-            val inputtedActivity : Int = activitySpinner.firstVisiblePosition
-            val inputtedFood : Int = foodSpinner.firstVisiblePosition
+            val inputtedActivity : Int = activitySpinner.selectedItemPosition
+            val inputtedFood : Int = foodSpinner.selectedItemPosition
             val inputtedActivityName : String = activitySpinner.getItemAtPosition(inputtedActivity).toString()
             val inputtedFoodName : String = foodSpinner.getItemAtPosition(inputtedFood).toString()
             val inputtedFoodNumber : Int = foodSeekBar.getProgress()
@@ -90,11 +93,6 @@ class MainActivity : AppCompatActivity() {
             val arrayAdapter = ArrayAdapter<Address>(this, android.R.layout.select_dialog_multichoice)
             val arrayAdapter2 = ArrayAdapter<String>(this, android.R.layout.select_dialog_multichoice)
 
-
-            if(inputtedFoodNumber == 0 && inputtedActivityNumber == 0){
-                Toast.makeText(this, "Please put a value greater than 0 for one of them", Toast.LENGTH_LONG).show()
-            }
-            else {
                 // create the alert diaolg
                 val builder = AlertDialog.Builder(this)
                 // set the title and other things to be displayed in the box
@@ -110,25 +108,17 @@ class MainActivity : AppCompatActivity() {
                 // Asynchronously access the geocoder class to get the result from users input
                 doAsync{
                     val geocoder = Geocoder(this@MainActivity)
-                    var check1 : Boolean = false
-                    var check2 : Boolean = false
                     runOnUiThread { progressBar.isVisible = true }
                     val results: List<Address> = try {
-                        check2 = true
                         geocoder.getFromLocationName(preferences.getString("userInput",""),5)
                     }
                     catch (exception : Exception){
                         exception.printStackTrace()
-                        runOnUiThread {
-                            Toast.makeText(this@MainActivity, "No Internet Connection", Toast.LENGTH_SHORT).show()
-                            progressBar.isVisible = false }
-                        check1 = true
                         listOf<Address>()
                     }
 
-                    if (results.isNotEmpty() && check1 == false && check2 == true){
+                    if (results.isNotEmpty()){
                         // the size of the results array of returned values from geocode
-                        check2 = false
                         var length = results.size
 
                         // for debugging
@@ -150,64 +140,57 @@ class MainActivity : AppCompatActivity() {
                             Toast.makeText(this@MainActivity, "No Results", Toast.LENGTH_SHORT).show()
                         }
                     }
-                }
 
-            }
+                }
 
 
         }
 
         // initial state of checks should be false so the search button is not clickable until all fields are entered
         searchButton.isEnabled = false
-        foodChange = false
-        activityChange = false
-        searchChange = false
+
 
         foodSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                // parent is the current value selected in the spinner
-                if (parent != null) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+
                     // if the parent position does not equal the defualt of "Choose Food" set the check to true
-                    if(!parent.getItemAtPosition(position).equals("Choose Food")){
+                    if(parent.selectedItemPosition != 0){
                         foodChange = true
                     }
                     // if it is, set to false
-                    if(parent.getItemAtPosition(position).equals("Choose Food")){
+                    if(parent.selectedItemPosition == 0){
                         foodChange = false
                     }
                     // if all of the other vaules have been set, enable the search button
-                    if(foodChange === true && activityChange === true && searchChange === true) {
+                    if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
                         searchButton.isEnabled = true
                     }
                     // if not, do not enable the search button
                     else{
                         searchButton.isEnabled = false
                     }
-                }
             }
         }
 
         activitySpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 // if not  null and the position is not at the default, set
 
-                if (parent != null) {
-                    if(!parent.getItemAtPosition(position).equals("Choose Activity")){
+                    if(parent.selectedItemPosition != 0){
                         activityChange = true
                     }
-                    if(parent.getItemAtPosition(position).equals("Choose Activity")){
+                    if(parent.selectedItemPosition == 0){
                         activityChange = false
                     }
-                    if(foodChange && activityChange && searchChange) {
+                    if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
                         searchButton.isEnabled = true
                     }
                     else{searchButton.isEnabled = false}
                 }
-            }
         }
 
         // add a listener to the userInput Field to track changes
@@ -219,7 +202,7 @@ class MainActivity : AppCompatActivity() {
                 // check that the code has not been changed and if not enable the search button
                 searchChange = inputtedUser.trim().isNotEmpty()
 
-                if(foodChange && activityChange && searchChange) {
+                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
                     searchButton.isEnabled = true
                 }
                 else{searchButton.isEnabled = false}
@@ -231,13 +214,37 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //update the number beside the seek bar with the value the seek bar is at currently
                 foodNumber.text = progress.toString()
+                if(progress == 0){
+                    foodNumberChange = false
+                }
+                if(progress !=0 ){
+                    foodNumberChange = true
+                }
+
+                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
+                    searchButton.isEnabled = true
+                }
+                else{searchButton.isEnabled = false}
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         activitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {activityNumber.text = progress.toString()}
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                activityNumber.text = progress.toString()
+                if(progress == 0){
+                    activityNumberChange = false
+                }
+                if(progress !=0 ){
+                    activityNumberChange = true
+                }
+
+                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
+                    searchButton.isEnabled = true
+                }
+                else{searchButton.isEnabled = false}
+            }
             override fun onStartTrackingTouch(seekBar: SeekBar?) { }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })

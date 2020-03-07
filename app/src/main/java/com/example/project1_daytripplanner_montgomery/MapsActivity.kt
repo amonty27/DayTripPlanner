@@ -68,6 +68,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val markerLatLng : LatLng = LatLng(address.latitude, address.longitude)
         val streetAddress : String = address.getAddressLine(0)
         val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
+        val inputtedActivity = preferences.getString("activitySpinnerName", "")
+        val inputtedActivityNumber = preferences.getInt("activitySeekBar", 0)
+        val inputtedFood = preferences.getString("foodSpinnerName","")
+        val inputtedFoodNumber = preferences.getInt("foodSeekBar",0)
         val mamp = MapsManager()
         val yelpApiKey = getString(R.string.yelp_key)
 
@@ -76,8 +80,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 mamp.retrieveActivity(
                     markerLatLng.latitude,
                     markerLatLng.longitude,
-                    preferences,
-                    yelpApiKey
+                    yelpApiKey,
+                    inputtedActivity,
+                    inputtedActivityNumber,
+                    inputtedFood,
+                    inputtedFoodNumber
                 )
 
             } catch (exception: Exception) {

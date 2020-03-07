@@ -52,12 +52,12 @@ class MapsManager {
         okHttpClient = builder.build()
     }
 
-    fun retrieveActivity(latitude: Double, longitude: Double, sharedPreferences: SharedPreferences, yelpApiKey : String): List<places>{
+    fun retrieveActivity(latitude: Double, longitude: Double, yelpApiKey : String, activitySpinnerName: String?, activitySeekBar : Int, foodSpinnerName : String?, foodSeekBar : Int): List<places>{
         // get the name of the activity and
-        val inputtedActivity = sharedPreferences.getString("activitySpinnerName", "")
-        val inputtedActivityNumber = sharedPreferences.getInt("activitySeekBar", 0)
-        val inputtedFood = sharedPreferences.getString("foodSpinnerName","")
-        val inputtedFoodNumber = sharedPreferences.getInt("foodSeekBar",0)
+        val inputtedActivity = activitySpinnerName
+        val inputtedActivityNumber = activitySeekBar
+        val inputtedFood = foodSpinnerName
+        val inputtedFoodNumber = foodSeekBar
 
         Log.d("liciTag", "value of inputtedActivity: " + inputtedActivity)
         Log.d("liciTag", "value of inputtedActivityNumber: " + inputtedActivityNumber)
