@@ -8,5 +8,6 @@ data class places (
     val pricePoint : String,
     val url : String,
     val lat : Double,
-    val long : Double
+    val long : Double,
+    val type : Int // 0 for food, 1 for activity. Using for differentiating map marker colors
 )

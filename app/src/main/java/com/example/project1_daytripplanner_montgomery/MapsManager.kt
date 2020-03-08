@@ -58,7 +58,7 @@ class MapsManager {
                          activitySpinnerName: String?,
                          activitySeekBar : Int,
                          foodSpinnerName : String?,
-                         foodSeekBar : Int): MutableList<places>{
+                         foodSeekBar : Int): ArrayList<places>{
         // get the name of the activity and
         val inputtedActivity = activitySpinnerName
         val inputtedActivityNumber = activitySeekBar
@@ -79,7 +79,7 @@ class MapsManager {
 
         val response = okHttpClient.newCall(request).execute()
 
-        val placesyolo: MutableList<places> = mutableListOf()
+        val places: ArrayList<places> = arrayListOf()
         val responseString: String? = response.body?.string()
 
         /*data class places (
@@ -115,10 +115,11 @@ class MapsManager {
                     Log.d("liciTag", "value of pricePoint: $pricePoint")
                     val json: JSONObject = JSONObject(responseString)
                     val url = curr.getString("url")
+                    Log.d("liciTag", "url: $url")
 
                     val latLng = curr.getJSONObject("coordinates")
-                    val lat = latLng.getInt("latitude").toDouble()
-                    val long = latLng.getInt("longitude").toDouble()
+                    val lat = latLng.getDouble("latitude")
+                    val long = latLng.getDouble("longitude")
 
                     val place = places(
                         name = name,
@@ -128,10 +129,11 @@ class MapsManager {
                         pricePoint = pricePoint,
                         url = url,
                         lat = lat,
-                        long = long
+                        long = long,
+                        type = 1
                     )
 
-                    placesyolo.add(place)
+                    places.add(place)
                 }
 
 
@@ -172,9 +174,11 @@ class MapsManager {
                     val json: JSONObject = JSONObject(responseString)
                     val url = curr2.getString("url")
 
+                    Log.d("liciTag", "url: $url")
+
                     val latLng = curr2.getJSONObject("coordinates")
-                    val lat = latLng.getInt("latitude").toDouble()
-                    val long = latLng.getInt("longitude").toDouble()
+                    val lat = latLng.getDouble("latitude")
+                    val long = latLng.getDouble("longitude")
 
                     val place = places(
                         name = name,
@@ -184,15 +188,16 @@ class MapsManager {
                         pricePoint = pricePoint,
                         url = url,
                         lat = lat,
-                        long = long
+                        long = long,
+                        type = 0
                     )
 
-                    placesyolo.add(place)
+                    places.add(place)
                 }
             } else {
                 Log.d("liciTag", "didnt work2")
             }
         }
-       return placesyolo
+       return places
     }
 }

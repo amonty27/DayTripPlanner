@@ -100,7 +100,11 @@ class MainActivity : AppCompatActivity() {
                 builder.setAdapter(arrayAdapter2) { dialog, which ->
                     // create and start an intent to go to the MapsActivity
                         val intent = Intent(this, MapsActivity::class.java)
-                        intent.putExtra("result", arrayAdapter.getItem(which))
+                        intent.putExtra("address", arrayAdapter.getItem(which))
+                        intent.putExtra("activitySpinnerName", inputtedActivityName)
+                        intent.putExtra("activitySeekBar", inputtedActivityNumber)
+                        intent.putExtra("foodSpinnerName", inputtedFoodName)
+                        intent.putExtra("foodSeekBar", inputtedFoodNumber)
                         startActivity(intent)
                 }
                 builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })

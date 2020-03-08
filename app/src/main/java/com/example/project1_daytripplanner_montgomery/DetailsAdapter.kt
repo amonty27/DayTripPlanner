@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import android.util.Log
 
 
 class DetailsAdapter(val places: List<places>) : RecyclerView.Adapter<DetailsAdapter.ViewHolder>() {
@@ -59,6 +60,7 @@ class DetailsAdapter(val places: List<places>) : RecyclerView.Adapter<DetailsAda
 
     // Return the total number of rows you expect your list to have
     override fun getItemCount(): Int {
+        Log.d("licitag", "size of items in list: ${places.size}")
         return places.size
     }
 
