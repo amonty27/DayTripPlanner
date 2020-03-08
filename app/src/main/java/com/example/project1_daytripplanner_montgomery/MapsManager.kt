@@ -52,7 +52,13 @@ class MapsManager {
         okHttpClient = builder.build()
     }
 
-    fun retrieveActivity(latitude: Double, longitude: Double, yelpApiKey : String, activitySpinnerName: String?, activitySeekBar : Int, foodSpinnerName : String?, foodSeekBar : Int): List<places>{
+    fun retrieveActivity(latitude: Double,
+                         longitude: Double,
+                         yelpApiKey : String,
+                         activitySpinnerName: String?,
+                         activitySeekBar : Int,
+                         foodSpinnerName : String?,
+                         foodSeekBar : Int): MutableList<places>{
         // get the name of the activity and
         val inputtedActivity = activitySpinnerName
         val inputtedActivityNumber = activitySeekBar
@@ -73,7 +79,7 @@ class MapsManager {
 
         val response = okHttpClient.newCall(request).execute()
 
-        val places: MutableList<places> = mutableListOf()
+        val placesyolo: MutableList<places> = mutableListOf()
         val responseString: String? = response.body?.string()
 
         /*data class places (
@@ -111,8 +117,8 @@ class MapsManager {
                     val url = curr.getString("url")
 
                     val latLng = curr.getJSONObject("coordinates")
-                    val lat = latLng.getInt("latitude").toFloat()
-                    val long = latLng.getInt("longitude").toFloat()
+                    val lat = latLng.getInt("latitude").toDouble()
+                    val long = latLng.getInt("longitude").toDouble()
 
                     val place = places(
                         name = name,
@@ -125,7 +131,7 @@ class MapsManager {
                         long = long
                     )
 
-                    places.add(place)
+                    placesyolo.add(place)
                 }
 
 
@@ -167,8 +173,8 @@ class MapsManager {
                     val url = curr2.getString("url")
 
                     val latLng = curr2.getJSONObject("coordinates")
-                    val lat = latLng.getInt("latitude").toFloat()
-                    val long = latLng.getInt("longitude").toFloat()
+                    val lat = latLng.getInt("latitude").toDouble()
+                    val long = latLng.getInt("longitude").toDouble()
 
                     val place = places(
                         name = name,
@@ -181,12 +187,12 @@ class MapsManager {
                         long = long
                     )
 
-                    places.add(place)
+                    placesyolo.add(place)
                 }
             } else {
                 Log.d("liciTag", "didnt work2")
             }
         }
-       return places
+       return placesyolo
     }
 }

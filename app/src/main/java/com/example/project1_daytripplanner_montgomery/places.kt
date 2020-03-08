@@ -7,6 +7,6 @@ data class places (
     val address : String,
     val pricePoint : String,
     val url : String,
-    val lat : Float,
-    val long : Float
+    val lat : Double,
+    val long : Double
 )

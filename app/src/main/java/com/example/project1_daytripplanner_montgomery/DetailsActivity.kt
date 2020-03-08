@@ -40,8 +40,8 @@ class DetailsActivity : AppCompatActivity() {
                 address = "511 10th St NW, Washington, DC 20004",
                 pricePoint = "",
                 url = "https://www.yelp.com/biz/fords-theatre-washington?adjust_creative=keu-kOIeln4R7XPAEsPSYg&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=keu-kOIeln4R7XPAEsPSYg",
-                lat = 0.0f,
-                long = 0.0f
+                lat = 0.0,
+                long = 0.0
             ),
             places(
                 name = "Ford’s Theatre",
@@ -50,8 +50,8 @@ class DetailsActivity : AppCompatActivity() {
                 address = "511 10th St NW, Washington, DC 20004",
                 pricePoint = "$$$",
                 url = "https://www.yelp.com/biz/fords-theatre-washington?adjust_creative=keu-kOIeln4R7XPAEsPSYg&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=keu-kOIeln4R7XPAEsPSYg",
-                lat = 0.0f,
-                long = 0.0f
+                lat = 0.0,
+                long = 0.0
             ),
             places(
                 name = "Ford’s Theatre",
@@ -60,8 +60,8 @@ class DetailsActivity : AppCompatActivity() {
                 address = "511 10th St NW, Washington, DC 20004",
                 pricePoint = "$",
                 url = "https://www.yelp.com/biz/fords-theatre-washington?adjust_creative=keu-kOIeln4R7XPAEsPSYg&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=keu-kOIeln4R7XPAEsPSYg",
-                lat = 0.0f,
-                long = 0.0f
+                lat = 0.0,
+                long = 0.0
             )
         )
     }

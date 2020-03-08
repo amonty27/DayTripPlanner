@@ -42,8 +42,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var detailsButton : Button
-   // private lateinit var yelpApiKey: String
-    private lateinit var places : places
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,15 +55,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // get the button
         detailsButton = findViewById(R.id.detailsButton)
-
         detailsButton.setOnClickListener{
             val intent = Intent(this, DetailsActivity::class.java)
             startActivity(intent)
         }
 
-        val address: Address = intent.getParcelableExtra<Address>("result")
+        /*val address: Address = intent.getParcelableExtra<Address>("result")
         // get values from the address to use in making a marker on the map
-        val markerLatLng : LatLng = LatLng(address.latitude, address.longitude)
+        val markerLatLng = LatLng(address.latitude, address.longitude)
         val streetAddress : String = address.getAddressLine(0)
         val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
         val inputtedActivity = preferences.getString("activitySpinnerName", "")
@@ -76,7 +73,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val yelpApiKey = getString(R.string.yelp_key)
 
         doAsync {
-            val places = try {
+            placeP = try {
                 mamp.retrieveActivity(
                     markerLatLng.latitude,
                     markerLatLng.longitude,
@@ -88,10 +85,55 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
 
             } catch (exception: Exception) {
-                listOf<places>()
+                mutableListOf()
             }
+        }*/
 
+
+    }
+    fun getPlaces(){
+
+        //return placeP
+        val address: Address = intent.getParcelableExtra<Address>("result")
+        // get values from the address to use in making a marker on the map
+        val markerLatLng = LatLng(address.latitude, address.longitude)
+        val streetAddress : String = address.getAddressLine(0)
+        val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
+        val inputtedActivity = preferences.getString("activitySpinnerName", "")
+        val inputtedActivityNumber = preferences.getInt("activitySeekBar", 0)
+        val inputtedFood = preferences.getString("foodSpinnerName","")
+        val inputtedFoodNumber = preferences.getInt("foodSeekBar",0)
+        val mamp = MapsManager()
+        val yelpApiKey = getString(R.string.yelp_key)
+        var placeP : MutableList<places> = mutableListOf()
+
+        doAsync {
+            placeP = try {
+                Log.d("licitag", "got here i guess so that thats good")
+                mamp.retrieveActivity(
+                    markerLatLng.latitude,
+                    markerLatLng.longitude,
+                    yelpApiKey,
+                    inputtedActivity,
+                    inputtedActivityNumber,
+                    inputtedFood,
+                    inputtedFoodNumber
+                )
+
+            } catch (exception: Exception) {
+                Log.d("licitag", "got here i guess so that thats bad")
+                mutableListOf()
+            }
         }
+
+        Log.d("licitag", "size of placeP : ${placeP.size}")
+        runOnUiThread {
+            val markerOptions2 = MarkerOptions().position(LatLng(placeP.get(0).lat, placeP.get(0).long)).title(placeP.get(0).address)
+            mMap.addMarker(markerOptions2)
+        }
+        Log.d("licitag", "size of placeP : ${placeP.size}")
+
+
     }
 
     /**
@@ -109,19 +151,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // for debugging
         Log.d("liciTag", "value of marker lat: " + markerLatLng.latitude + "___value of maker long: " + markerLatLng.longitude)
 
+        val placeP2 = getPlaces()
         // create a new marker and add it to the map
         val markerOptions = MarkerOptions().position(markerLatLng).title(streetAddress)
         mMap.addMarker(markerOptions)
 
+        //val markerOptions2 = MarkerOptions().position(LatLng(placeP2.get(0).lat, placeP2.get(0).long)).title(placeP2.get(0).address)
+        //mMap.addMarker(markerOptions2)
+
         // update the camera to point to the Address
-        val zoom : Float = 13.9f
+        val zoom = 13.9f
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerLatLng,zoom))
 
         // create a circle around the maker 1500m wide
         val circleOptions : CircleOptions = CircleOptions().center(markerLatLng).radius(1500.0)
         mMap.addCircle(circleOptions)
 
-        val preferences = getSharedPreferences("dayTripPlaner_data", Context.MODE_PRIVATE)
-
     }
+
 }
