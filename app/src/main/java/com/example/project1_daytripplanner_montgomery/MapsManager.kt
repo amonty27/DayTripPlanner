@@ -1,38 +1,19 @@
 package com.example.project1_daytripplanner_montgomery
 
-import android.app.Activity
-import android.content.Context
-import android.content.SharedPreferences
-import com.google.android.gms.maps.model.LatLng
+
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
-
-
-import android.content.DialogInterface
-import android.content.Intent
-import android.location.Geocoder
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.View
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.core.view.get
-import org.jetbrains.anko.doAsync
-import android.location.Address
 import java.lang.Exception
 
 /*
-    TODO
-        - retireve api key from xml file or something like that
+    Sometimes, it returns things that are outside of the 1500m radius and I am not sure how to fix that when
+    I specify for it
  */
-
 class MapsManager {
 
     private val okHttpClient: OkHttpClient

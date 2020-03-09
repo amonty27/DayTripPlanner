@@ -42,8 +42,6 @@ class MainActivity : AppCompatActivity() {
     var foodChange : Boolean = false
     var activityChange : Boolean = false
     var searchChange : Boolean = false
-    var activityNumberChange : Boolean = false
-    var foodNumberChange : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                         foodChange = false
                     }
                     // if all of the other vaules have been set, enable the search button
-                    if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
+                    if(foodChange && activityChange && searchChange) {
                         searchButton.isEnabled = true
                     }
                     // if not, do not enable the search button
@@ -190,7 +188,7 @@ class MainActivity : AppCompatActivity() {
                     if(parent.selectedItemPosition == 0){
                         activityChange = false
                     }
-                    if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
+                    if(foodChange && activityChange && searchChange) {
                         searchButton.isEnabled = true
                     }
                     else{searchButton.isEnabled = false}
@@ -206,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                 // check that the code has not been changed and if not enable the search button
                 searchChange = inputtedUser.trim().isNotEmpty()
 
-                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
+                if(foodChange && activityChange && searchChange) {
                     searchButton.isEnabled = true
                 }
                 else{searchButton.isEnabled = false}
@@ -218,17 +216,6 @@ class MainActivity : AppCompatActivity() {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 //update the number beside the seek bar with the value the seek bar is at currently
                 foodNumber.text = progress.toString()
-                if(progress == 0){
-                    foodNumberChange = false
-                }
-                if(progress !=0 ){
-                    foodNumberChange = true
-                }
-
-                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
-                    searchButton.isEnabled = true
-                }
-                else{searchButton.isEnabled = false}
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -237,17 +224,6 @@ class MainActivity : AppCompatActivity() {
         activitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 activityNumber.text = progress.toString()
-                if(progress == 0){
-                    activityNumberChange = false
-                }
-                if(progress !=0 ){
-                    activityNumberChange = true
-                }
-
-                if(foodChange && activityChange && searchChange && (activityNumberChange||foodNumberChange)) {
-                    searchButton.isEnabled = true
-                }
-                else{searchButton.isEnabled = false}
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) { }
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}

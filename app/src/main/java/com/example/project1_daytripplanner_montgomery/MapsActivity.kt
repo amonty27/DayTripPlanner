@@ -16,6 +16,7 @@ import android.location.Address
 import android.util.Log
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.view.isVisible
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CircleOptions
@@ -52,17 +53,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val inputtedFoodNumber = intent.getIntExtra("foodSeekBar", 0)
 
         progressBar = findViewById(R.id.progressBar2)
-        // get the button
         detailsButton = findViewById(R.id.detailsButton)
-        /*detailsButton.setOnClickListener{
-            val intent = Intent(this, DetailsActivity::class.java)
-            intent.putExtra("result", address)
-            intent.putExtra("activitySpinnerName", inputtedActivityName)
-            intent.putExtra("activitySeekBar", inputtedActivityNumber)
-            intent.putExtra("foodSpinnerName", inputtedFoodName)
-            intent.putExtra("foodSeekBar", inputtedFoodNumber)
-            startActivity(intent)
-        }*/
     }
 
     /**
@@ -129,13 +120,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
                 }
+                runOnUiThread{
+                    intent.putExtra("places", placeP)
+                    detailsButton.isEnabled = true
+                    progressBar.isVisible = false
+                }
             }
 
-            runOnUiThread{
-                intent.putExtra("places", placeP)
-                detailsButton.isEnabled = true
-                progressBar.isVisible = false
+            if(placeP.isEmpty()){
+                runOnUiThread{
+                    intent.putExtra("places", placeP)
+                    Toast.makeText(this@MapsActivity, "No Results", Toast.LENGTH_SHORT).show()
+                    detailsButton.isEnabled = false
+                    progressBar.isVisible = false
+                }
             }
+
         }
 
         detailsButton.setOnClickListener{
