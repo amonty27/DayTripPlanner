@@ -1,5 +1,7 @@
 package com.example.project1_daytripplanner_montgomery
 
+import java.io.Serializable
+
 data class places (
     val name: String,
     val rating : Float,
@@ -10,4 +12,4 @@ data class places (
     val lat : Double,
     val long : Double,
     val type : Int // 0 for food, 1 for activity. Using for differentiating map marker colors
-)
+) :Serializable

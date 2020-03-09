@@ -65,12 +65,12 @@ class MapsManager {
         val inputtedFood = foodSpinnerName
         val inputtedFoodNumber = foodSeekBar
 
-        Log.d("liciTag", "value of inputtedActivity: " + inputtedActivity)
+        /*Log.d("liciTag", "value of inputtedActivity: " + inputtedActivity)
         Log.d("liciTag", "value of inputtedActivityNumber: " + inputtedActivityNumber)
         Log.d("liciTag", "value of inputtedFood: " + inputtedFood)
         Log.d("liciTag", "value of inputtedFoodNumber: " + inputtedFoodNumber)
 
-        Log.d("liciTag", "value of yelpApiKey: " + yelpApiKey)
+        Log.d("liciTag", "value of yelpApiKey: " + yelpApiKey)*/
         //val yelpApiKey = getString()
         val request = Request.Builder()
             .url("https://api.yelp.com/v3/businesses/search?term=$inputtedActivity&latitude=$latitude&longitude=$longitude&limit=$inputtedActivityNumber&sort_by=rating&radius=1500")
@@ -94,7 +94,7 @@ class MapsManager {
         )*/
         if (inputtedActivityNumber != 0) {
             if (!responseString.isNullOrEmpty() && response.isSuccessful) {
-                Log.d("liciTag", "this worked i guess yippy")
+               // Log.d("liciTag", "this worked i guess yippy")
                 val json: JSONObject = JSONObject(responseString)
                 val businesses: JSONArray = json.getJSONArray("businesses")
 
@@ -112,7 +112,7 @@ class MapsManager {
                     } catch (exception: Exception) {
                         ""
                     }
-                    Log.d("liciTag", "value of pricePoint: $pricePoint")
+                    //Log.d("liciTag", "value of pricePoint: $pricePoint")
                     val json: JSONObject = JSONObject(responseString)
                     val url = curr.getString("url")
                     Log.d("liciTag", "url: $url")
@@ -138,7 +138,7 @@ class MapsManager {
 
 
             } else {
-                Log.d("liciTag", "didnt work")
+                //Log.d("liciTag", "didnt work")
             }
         }
 
@@ -152,7 +152,7 @@ class MapsManager {
             val responseString2: String? = response2.body?.string()
 
             if (!responseString2.isNullOrEmpty() && response2.isSuccessful) {
-                Log.d("liciTag", "this worked i guess yippy 2")
+                //Log.d("liciTag", "this worked i guess yippy 2")
                 val json2: JSONObject = JSONObject(responseString2)
                 val businesses2: JSONArray = json2.getJSONArray("businesses")
 
@@ -170,7 +170,7 @@ class MapsManager {
                     } catch (exception: Exception) {
                         ""
                     }
-                    Log.d("liciTag", "value of pricePoint: $pricePoint")
+                    //Log.d("liciTag", "value of pricePoint: $pricePoint")
                     val json: JSONObject = JSONObject(responseString)
                     val url = curr2.getString("url")
 
@@ -195,7 +195,7 @@ class MapsManager {
                     places.add(place)
                 }
             } else {
-                Log.d("liciTag", "didnt work2")
+                //Log.d("liciTag", "didnt work2")
             }
         }
        return places
