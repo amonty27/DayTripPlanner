@@ -20,6 +20,7 @@
         android:layout_height="50dp"
         android:layout_marginBottom="24dp"
         android:text="Details"
+        android:enabled="false"
         map:layout_constraintBottom_toBottomOf="@+id/map"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent" />

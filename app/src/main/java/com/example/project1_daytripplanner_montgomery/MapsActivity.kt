@@ -80,9 +80,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val inputtedFoodNumber = intent.getIntExtra("foodSeekBar", 0)
         val mamp = MapsManager()
         val yelpApiKey = getString(R.string.yelp_key)
+        val wmta_key = getString(R.string.wmta_key)
+        val wmta_value = getString(R.string.wmta_value)
         var placeP : ArrayList<places>
+        var metro : ArrayList<metro>
 
         val intent = Intent(this, DetailsActivity::class.java)
+/*
         doAsync {
             placeP = try {
                // Log.d("licitag", "got here i guess so that thats good")
@@ -118,25 +122,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
                             )
                         }
+                        intent.putExtra("places", placeP)
                     }
-                }
-                runOnUiThread{
-                    intent.putExtra("places", placeP)
-                    detailsButton.isEnabled = true
-                    progressBar.isVisible = false
                 }
             }
 
             if(placeP.isEmpty()){
                 runOnUiThread{
                     intent.putExtra("places", placeP)
-                    Toast.makeText(this@MapsActivity, "No Results", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MapsActivity, "No Results for Activities or Food", Toast.LENGTH_SHORT).show()
                     detailsButton.isEnabled = false
                     progressBar.isVisible = false
                 }
             }
 
         }
+*/
 
         detailsButton.setOnClickListener{
             intent.putExtra("result", address)
@@ -160,6 +161,106 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // create a circle around the maker 1500m wide
         val circleOptions : CircleOptions = CircleOptions().center(markerLatLng).radius(1500.0)
         mMap.addCircle(circleOptions)
+
+        doAsync {
+            var check = 0
+            placeP = try {
+                // Log.d("licitag", "got here i guess so that thats good")
+                mamp.retrieveActivity(
+                    markerLatLng.latitude,
+                    markerLatLng.longitude,
+                    yelpApiKey,
+                    inputtedActivityName,
+                    inputtedActivityNumber,
+                    inputtedFoodName,
+                    inputtedFoodNumber
+                )
+
+            } catch (exception: Exception) {
+                //Log.d("licitag", "got here i guess so that thats bad")
+                exception.printStackTrace()
+                arrayListOf()
+            }
+
+            if(placeP.isNotEmpty()){
+                check = 1
+                placeP.forEach{
+                    runOnUiThread {
+                        val markerOptions2 =
+                            MarkerOptions().position(LatLng(it.lat, it.long))
+                                .title(it.name)
+                        if(it.type == 0) { //food
+                            mMap.addMarker(markerOptions2).setIcon(
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                            )
+                        }
+                        if(it.type == 1){ // activity
+                            mMap.addMarker(markerOptions2).setIcon(
+                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)
+                            )
+                        }
+                        intent.putExtra("places", placeP)
+                    }
+                }
+            }
+
+            if(placeP.isEmpty()){
+                runOnUiThread{
+                    intent.putExtra("places", placeP)
+                    Toast.makeText(this@MapsActivity, "No Results for Activities or Food", Toast.LENGTH_SHORT).show()
+                    detailsButton.isEnabled = false
+                    progressBar.isVisible = false
+                    check = 0
+                }
+            }
+            metro = try {
+                mamp.returnMetro(markerLatLng.latitude,
+                    markerLatLng.longitude,wmta_key, wmta_value)
+            }
+            catch(exception : Exception){
+                exception.printStackTrace()
+                arrayListOf<metro>()
+            }
+
+            if(metro.isNotEmpty()){
+                Log.d("licitag", "got here i guess so that thats good metro")
+                metro.forEach{
+                    runOnUiThread {
+                        val markerOptions2 =
+                            MarkerOptions().position(LatLng(it.lat, it.long))
+                                .title(it.name)
+                        mMap.addMarker(markerOptions2).setIcon(
+                            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
+                    }
+                }
+                if(check == 1) {
+                    runOnUiThread {
+                        detailsButton.isEnabled = true
+                        progressBar.isVisible = false
+                    }
+                }
+            }
+
+            if(metro.isEmpty()){
+                Log.d("licitag", "got here i guess so that thats bad metro")
+                runOnUiThread{
+                    Toast.makeText(this@MapsActivity, "No Results for WMTA Metros", Toast.LENGTH_SHORT).show()
+                }
+                if(check == 0) {
+                    runOnUiThread {
+                        detailsButton.isEnabled = false
+                        progressBar.isVisible = false
+                    }
+                }
+                if(check == 1) {
+                    runOnUiThread {
+                        detailsButton.isEnabled = true
+                        progressBar.isVisible = false
+                    }
+                }
+            }
+        }
+
 
 
     }

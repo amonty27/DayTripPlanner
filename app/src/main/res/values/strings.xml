@@ -6,7 +6,7 @@
     <string name="search">Search</string>
     <string name="_0">0</string>
     <string name="address">2121 H st. NW, Washington, D.C. 20052</string>
-    <string name="pricePoint">$$$$$</string>
+    <string name="pricePoint">$$$$</string>
 
     <!--- arrays -->
     <string-array name="restaurant_types">
@@ -20,7 +20,7 @@
 
     <string-array name="activities_types">
         <item>Choose Activity</item>
-        <item>arcades</item>
+        <item>recreation</item>
         <item>museums</item>
         <item>fashion</item>
         <item>tours</item>
