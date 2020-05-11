@@ -1,4 +1,4 @@
-# CSCI 4237 - Project 1 - Day Trip Planner
+# Day Trip Planner
 Day Trip Planner is a simple app to help plan interesting things to do near a desired location.
 
 #### App Details
